@@ -1,0 +1,6 @@
+# directories to ignore
+/watchdog/watchdog/__pycache__
+/watchdog/watchdog/spiders/__pycache__
+/venv
+
+# files to ignore
