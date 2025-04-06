@@ -1,17 +1,26 @@
-political aggregator for the senat and deputy chambers
-* scrape senat page 
+> in work
+
+right now this generates two files:
+* groups.csv -> contains all groups and links to them
+* members.csv -> contains each member and links to it
+
+---------------------------------------------------------
+
+political aggregator for the romanian senate and deputy chambers
+* scrape senate page 
     * get all parties
     * get all members from each party
     * get their biography
     * get their electronic votes and the laws they voted on
 * scrape deputy chamber page
 
-
+---------------------------------------------------------
 
 todo:
-* get list of all people in senate
-* get all required links
-
+* get biography and additional data
+* get voting data
+* update readme
+* provide usage instructiors
 
 step 1.
 scrape "https://www.senat.ro/EnumGrupuri.aspx" for ".nsnt-group-card__name" -> get names of all groups
@@ -23,4 +32,3 @@ e.g: get "https://www.senat.ro/ComponentaGrupuri.aspx?Zi&GrupID=1042f657-ab38-42
 step 3.
 go to each address 
 e.g get "https://www.senat.ro/FisaSenator.aspx?ParlamentarID=6E681419-5F69-41CD-85CA-ACEF5EED2A63" for everyone. this is not working as intended and should be checked
-
