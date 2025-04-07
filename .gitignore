@@ -5,3 +5,5 @@
 
 # files to ignore
 /output/*.csv
+/output/*.txt
+/output/*.json

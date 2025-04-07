@@ -20,7 +20,7 @@ todo:
 * get biography and additional data
 * get voting data
 * update readme
-* provide usage instructiors
+* provide usage instructions
 
 step 1.
 scrape "https://www.senat.ro/EnumGrupuri.aspx" for ".nsnt-group-card__name" -> get names of all groups
@@ -32,3 +32,7 @@ e.g: get "https://www.senat.ro/ComponentaGrupuri.aspx?Zi&GrupID=1042f657-ab38-42
 step 3.
 go to each address 
 e.g get "https://www.senat.ro/FisaSenator.aspx?ParlamentarID=6E681419-5F69-41CD-85CA-ACEF5EED2A63" for everyone. this is not working as intended and should be checked
+
+first, a get call is required
+all fields that need to be added in the post request are coming in the get response
+as of now, this has not worked manually yet
