@@ -11,4 +11,5 @@ scrapy crawl groups
 scrapy crawl members
 
 # run data collection
+scrapy crawl data
 

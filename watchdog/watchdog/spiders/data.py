@@ -6,9 +6,19 @@ from scrapy.http import FormRequest
 class DataSpider(scrapy.Spider):
     name = "data"
     allowed_domains = ["www.senat.ro"]
-    start_urls = ["https://www.senat.ro/FisaSenator.aspx?ParlamentarID=F1658CFA-9AEA-415D-8EF2-EC0E6E4046FC"]
+    start_urls = [
+        "https://www.senat.ro/FisaSenator.aspx?ParlamentarID=F1658CFA-9AEA-415D-8EF2-EC0E6E4046FC"
+    ]
     # stores member list data
     member_list = {}
+    current_page = 1
+    page_list = [
+        "ctl00$B_Center$Repeater14$ctl00$lnkBiog",
+        # "ctl00$B_Center$Repeater14$ctl00$lnkParlament",
+        # "ctl00$B_Center$Repeater14$ctl00$Motiuni",
+        # "ctl00$B_Center$Repeater14$ctl00$Voturi",
+        # "ctl00$B_Center$Repeater14$ctl00$DeclaratiiAv",
+    ]
 
     def __init__(self):
         # file = open("../output/members.csv", "r")
@@ -31,19 +41,24 @@ class DataSpider(scrapy.Spider):
         file = open("../output/get_data.txt", "w")
         file.write(response.text)
         file.close()
-        
-        # get a way to properly handle multiple pages
-        return self.get_biography(response)
 
-    def get_biography(self, response):
+        # get a way to properly handle multiple pages
+        return self.request_next_page(response)
+
+    # this should be done recursively
+    def request_next_page(self, response):
+        file = open("../output/" + self.page_list[self.current_page - 1] + ".txt", "w")
+        file.write(response.text)
+        file.close()
+
         post_request = {}
 
-        post_request["ctl00$MyScriptManager"] = (
-            "ctl00$B_Center$pnlUpd|ctl00$B_Center$Repeater14$ctl00$lnkBiog"
-        )
-        post_request["__EVENTTARGET"] = "ctl00$B_Center$Repeater14$ctl00$lnkBiog"
+        post_request["ctl00$MyScriptManager"] = ("ctl00$B_Center$pnlUpd|") + self.page_list[self.current_page - 1]
+        post_request["__EVENTTARGET"] = self.page_list[self.current_page - 1]
         post_request["__EVENTARGUMENT"] = ""
-        post_request["__VIEWSTATE"] = response.css("#__VIEWSTATE").xpath("@value").getall()[0]
+        post_request["__VIEWSTATE"] = (
+            response.css("#__VIEWSTATE").xpath("@value").getall()[0]
+        )
         post_request["__VIEWSTATEGENERATOR"] = "B2195F17"
         post_request["__SCROLLPOSITIONX"] = "0"
         post_request["__SCROLLPOSITIONY"] = "0"
@@ -62,18 +77,30 @@ class DataSpider(scrapy.Spider):
             "X-Requested-With": "XMLHttpRequest",
         }
 
-        return FormRequest(
-            url=response.request.url,
-            method="POST",
-            callback=self.parse_post_data,
-            formdata=post_request,
-            meta={"page": 1},
-            dont_filter=True,
-            headers=HEADERS,
-        )
+        if self.current_page < len(self.page_list):
+            self.current_page += 1
+            return FormRequest(
+                url=response.request.url,
+                method="POST",
+                callback=self.request_next_page,
+                formdata=post_request,
+                meta={"page": self.current_page - 1},
+                dont_filter=True,
+                headers=HEADERS,
+            )
+        else:
+            return FormRequest(
+                url=response.request.url,
+                method="POST",
+                callback=self.parse_final_page,
+                formdata=post_request,
+                meta={"page": self.current_page},
+                dont_filter=True,
+                headers=HEADERS,
+            )
 
     # in theory this should work
-    def parse_post_data(self, response):
-        file = open("../output/post_data.txt", "w")
+    def parse_final_page(self, response):
+        file = open("../output/" + self.page_list[self.current_page - 1] + ".txt", "w")
         file.write(response.text)
         file.close()
